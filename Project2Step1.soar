@@ -1,0 +1,56 @@
+sp {propose*initBank
+   (state <s> ^type state)
+   (<s> -^Bank) 
+-->
+   (<s> ^operator <o> + =)
+   (<o> ^name Bank)
+}
+
+sp {apply*initBank
+    (state <s> ^operator <o>)
+    (<o> ^name Bank)
+-->
+    (<s> ^Bank <Bank>)
+    (<Bank> ^AccountBalance 2000)
+}
+
+sp {propose*add4000
+    (state <s> ^Bank.AccountBalance >= 1000
+               ^Bank.AccountBalance < 5000)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name add4000)
+}
+
+sp {propose*add5000
+    (state <s> ^Bank.AccountBalance < 1000)             
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name add5000)
+}
+
+sp {apply*add5000
+    (state <s> ^operator <o> ^Bank.AccountBalance <AccountBalance>)
+    (<o> ^name add5000)
+-->
+    (<s> ^Bank.AccountBalance <AccountBalance> -)
+    (<s> ^Bank.AccountBalance (+ 4000 <AccountBalance>))
+    (write |Four thousand added.|)
+    
+}
+
+sp {apply*add4000
+    (state <s> ^operator <o> ^Bank.AccountBalance <AccountBalance>)
+    (<o> ^name add5000)
+-->
+    (<s> ^Bank.AccountBalance <AccountBalance> -)
+    (<s> ^Bank.AccountBalance (+ 5000 <AccountBalance>))
+    (write |Five thousand added.|)
+}
+
+sp {detect*over5000
+   (state <s> ^Bank.AccountBalance >= 5000)
+-->
+   (write |Balance over five thousand.|)
+   (halt)
+}
